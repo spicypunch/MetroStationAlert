@@ -70,4 +70,16 @@ dependencies {
 
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // Spinner
+    implementation("com.github.skydoves:orchestra-spinner:1.2.0")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1")
+
+    // DI
+    implementation("com.google.dagger:hilt-android:2.44.2")
+    annotationProcessor("com.google.dagger:hilt-android-compiler:2.44.2")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
 }
