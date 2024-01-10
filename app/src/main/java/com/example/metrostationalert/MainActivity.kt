@@ -1,153 +1,139 @@
 package com.example.metrostationalert
 
-import android.annotation.SuppressLint
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.metrostationalert.screen.SearchScreen
 import com.example.metrostationalert.ui.theme.MetroStationAlertTheme
-import com.example.metrostationalert.ui.theme.ViewModel
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        requestPermission(this)
+
+        val viewModel: ViewModel by viewModels()
+        viewModel.convertSubwayData(this)
+
+        val intent = Intent(this, Service::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            this.startForegroundService(intent)
+        } else {
+            this.startService(intent)
+        }
         setContent {
             MetroStationAlertTheme {
-                App()
+                App(viewModel)
             }
         }
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App() {
-    val viewModel = viewModel<ViewModel>()
-    viewModel.convertSubwayData(LocalContext.current)
-    val subwayStationsResult = viewModel.subwayStations.value
-
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    val optionList = rememberSaveable {
-        listOf("지하철역", "지하철 호선")
-    }
-    val (selectdeItem, setSelectedItem) = rememberSaveable {
-        mutableStateOf("검색 유형")
-    }
-    val (content, setContent) = rememberSaveable {
-        mutableStateOf("")
-    }
+fun App(viewModel: ViewModel) {
+    val navController = rememberNavController()
+    val bottomNavItems = listOf(
+        BottomNavItem.Search,
+        BottomNavItem.Bookmark
+    )
 
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text(text = "지금 내려야 한다.") }) }
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .padding(8.dp)
-        ) {
-            if (viewModel.isLoading.value) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                Row {
-//                    Spinner(
-//                        text = selectdeItem,
-//                        modifier = Modifier
-//                            .background(Color.LightGray)
-//                            .width(80.dp)
-//                            .height(35.dp),
-//                        itemList = optionList,
-//                        style = MaterialTheme.typography.bodyLarge,
-//                        properties = SpinnerProperties(
-//                            color = Color.Black,
-//                            textAlign = TextAlign.Center,
-//                            overflow = TextOverflow.Ellipsis,
-//                            maxLines = 1,
-//                            spinnerPadding = 16.dp,
-//                            spinnerBackgroundColor = MaterialTheme.colorScheme.background,
-//                        ),
-//                        onSpinnerItemSelected = { _, item ->
-//                            setSelectedItem(item)
-//                        }
-//                    )
-                    OutlinedTextField(
-                        value = content, onValueChange = setContent, modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f)
-                            .height(50.dp)
-                    )
-
-                    Button(
+        topBar = { CenterAlignedTopAppBar(title = { Text(text = "지금 내려야 한다.") }) },
+        bottomBar = {
+            NavigationBar {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+                bottomNavItems.forEach { screen ->
+                    NavigationBarItem(
+                        selected = currentRoute == screen.route,
                         onClick = {
-                            keyboardController?.hide()
-                            viewModel.searchStation(content)
+                            navController.navigate(screen.route) {
+                                navController.graph.startDestinationRoute?.let {
+                                    popUpTo(it) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
                         },
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .height(50.dp)
-                    ) {
-                        Text(text = "검색")
-                    }
-                }
-                LazyList(subwayStationsResult)
-            }
-        }
-    }
-}
-
-@Composable
-fun LazyList(subwayStationsResult: List<SubwayStationsEntity.SubwayStationItem>) {
-    LazyColumn() {
-        items(subwayStationsResult) { item ->
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Column {
-                    Text(text = "노선: ${item.lineName}")
-                    Text(text = "역이름: ${item.stationName}")
-                    Divider(
-                        modifier = Modifier
-                            .height(10.dp)
-                            .padding(8.dp)
+                        alwaysShowLabel = false,
+                        label = { Text(screen.title, fontSize = 9.sp) },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = screen.icon),
+                                contentDescription = screen.title
+                            )
+                        }
                     )
                 }
+            }
+        }
+    ) {
+        Box(
+            modifier = Modifier.padding(it)
+        ) {
+            NavHost(navController = navController, startDestination = BottomNavItem.Search.route) {
+                composable(route = BottomNavItem.Search.route) {
+                    SearchScreen(viewModel)
+                }
 
+                composable(route = BottomNavItem.Bookmark.route) {
+
+                }
             }
         }
     }
 }
 
-@Preview
-@Composable
-fun PreviewApp() {
-    App()
+
+fun requestPermission(context: Context) {
+    TedPermission.create()
+        .setPermissionListener(object : PermissionListener {
+            override fun onPermissionGranted() {
+                // TODO:
+            }
+
+            override fun onPermissionDenied(deniedPermissions: List<String>) {
+                Toast.makeText(
+                    context,
+                    "권한을 허가해주세요.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+        .setDeniedMessage("권한을 허용해주세요. [설정] > [앱 및 알림] > [고급] > [앱 권한]")
+        .setPermissions(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.POST_NOTIFICATIONS,
+        )
+        .check()
 }

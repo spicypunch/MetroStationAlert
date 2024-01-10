@@ -1,10 +1,9 @@
-package com.example.metrostationalert.ui.theme
+package com.example.metrostationalert
 
 import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.metrostationalert.SubwayStationsEntity
 import com.google.gson.Gson
 
 class ViewModel : ViewModel() {
@@ -17,9 +16,6 @@ class ViewModel : ViewModel() {
     private var _subwayStations =
         mutableStateOf(emptyList<SubwayStationsEntity.SubwayStationItem>())
     val subwayStations: State<List<SubwayStationsEntity.SubwayStationItem>> = _subwayStations
-
-    private var _searchResult = mutableStateOf<SubwayStationsEntity.SubwayStationItem?>(null)
-    val searchResult: State<SubwayStationsEntity.SubwayStationItem?> = _searchResult
 
     fun convertSubwayData(context: Context) {
         isLoading.value = true
@@ -35,6 +31,6 @@ class ViewModel : ViewModel() {
     }
 
     fun searchStation(searchString: String) {
-        _searchResult.value = subwayStationList.find { it.stationName.contains(searchString) }
+        _subwayStations.value = subwayStationList.filter { it.stationName.contains(searchString) }
     }
 }

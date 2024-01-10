@@ -82,4 +82,16 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.44.2")
     annotationProcessor("com.google.dagger:hilt-android-compiler:2.44.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
+
+    // TedPermission
+    implementation("io.github.ParkSangGwon:tedpermission-normal:3.3.0")
+
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // navigation
+    implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2")
 }
