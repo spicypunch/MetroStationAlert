@@ -1,10 +1,10 @@
-package com.example.metrostationalert
+package com.example.metrostationalert.data.entitiy
 
 
-import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-class SubwayStationsEntity : ArrayList<SubwayStationsEntity.SubwayStationItem>(){
+class SubwayStationsEntity : ArrayList<SubwayStationsEntity.SubwayStationItem>() {
     @Parcelize
     data class SubwayStationItem(
         val latitude: Double, // 37.513011

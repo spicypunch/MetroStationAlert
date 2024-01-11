@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.metrostationalert.data.entitiy.SubwayStationsEntity
 import com.google.gson.Gson
+import dagger.hilt.android.lifecycle.HiltViewModel
 
+@HiltViewModel
 class ViewModel : ViewModel() {
 
     val isLoading = mutableStateOf(false)
