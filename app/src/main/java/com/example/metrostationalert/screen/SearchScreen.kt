@@ -1,5 +1,6 @@
 package com.example.metrostationalert.screen
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,15 +30,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.example.metrostationalert.DataStoreModule
-import com.example.metrostationalert.SubwayStationsEntity
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.metrostationalert.data.entity.SubwayStationsEntity
 import com.example.metrostationalert.ViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(viewModel: ViewModel) {
-    val dataStore = DataStoreModule(LocalContext.current)
+fun SearchScreen(
+    viewModel: ViewModel = hiltViewModel()
+) {
 
     val subwayStationsResult = viewModel.subwayStations.value
 
@@ -53,7 +55,7 @@ fun SearchScreen(viewModel: ViewModel) {
         mutableStateOf("")
     }
     Column(
-        modifier = androidx.compose.ui.Modifier
+        modifier = Modifier
             .padding(8.dp)
     ) {
         if (viewModel.isLoading.value) {
@@ -106,23 +108,18 @@ fun SearchScreen(viewModel: ViewModel) {
                     Text(text = "검색")
                 }
             }
-            LazyList(subwayStationsResult, dataStore)
+            LazyList(subwayStationsResult)
         }
     }
 }
 
 @Composable
-fun LazyList(subwayStationsResult: List<SubwayStationsEntity.SubwayStationItem>, datStore: DataStoreModule) {
-    val scope = rememberCoroutineScope()
+fun LazyList(subwayStationsResult: List<SubwayStationsEntity.SubwayStationItem>) {
     LazyColumn() {
         items(subwayStationsResult) { item ->
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    scope.launch {
-                        datStore.saveLatitude(item.latitude)
-                        datStore.saveLongitude(item.longitude)
-                    }
                 }) {
                 Column {
                     Text(text = "노선: ${item.lineName}")

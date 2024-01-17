@@ -1,4 +1,6 @@
-package com.example.metrostationalert
+package com.example.metrostationalert.data
+
+import com.example.metrostationalert.R
 
 sealed class BottomNavItem(
     val route: String,

@@ -1,4 +1,4 @@
-package com.example.metrostationalert
+package com.example.metrostationalert.data.entity
 
 
 import kotlinx.parcelize.Parcelize

@@ -21,25 +21,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.metrostationalert.data.BottomNavItem
+import com.example.metrostationalert.screen.BookMarkScreen
 import com.example.metrostationalert.screen.SearchScreen
 import com.example.metrostationalert.ui.theme.MetroStationAlertTheme
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestPermission(this)
-
-        val viewModel: ViewModel by viewModels()
-        viewModel.convertSubwayData(this)
 
         val intent = Intent(this, Service::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -49,7 +52,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             MetroStationAlertTheme {
-                App(viewModel)
+                App()
             }
         }
     }
@@ -57,12 +60,15 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App(viewModel: ViewModel) {
+fun App(
+    viewModel: ViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     val bottomNavItems = listOf(
         BottomNavItem.Search,
         BottomNavItem.Bookmark
     )
+    viewModel.convertSubwayData(LocalContext.current)
 
     Scaffold(
         topBar = { CenterAlignedTopAppBar(title = { Text(text = "지금 내려야 한다.") }) },
@@ -102,11 +108,11 @@ fun App(viewModel: ViewModel) {
         ) {
             NavHost(navController = navController, startDestination = BottomNavItem.Search.route) {
                 composable(route = BottomNavItem.Search.route) {
-                    SearchScreen(viewModel)
+                    SearchScreen()
                 }
 
                 composable(route = BottomNavItem.Bookmark.route) {
-
+                    BookMarkScreen()
                 }
             }
         }
