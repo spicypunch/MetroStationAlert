@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
-        android:name="kr.jm.metrostationalert.Application"
+        android:name="kr.jm.metrostationalert.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,11 +24,10 @@
             android:theme="@style/Theme.MetroStationAlert">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="kr.jm.metrostationalert.Service" />
+        <service android:name="kr.jm.metrostationalert.Service"
+            android:exported="false"/>
     </application>
-
 </manifest>
