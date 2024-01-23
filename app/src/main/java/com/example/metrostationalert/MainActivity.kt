@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -39,17 +39,11 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         requestPermission(this)
 
-        val intent = Intent(this, Service::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(intent)
-        } else {
-            this.startService(intent)
-        }
         setContent {
             MetroStationAlertTheme {
                 App()
@@ -119,12 +113,17 @@ fun App(
     }
 }
 
-
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun requestPermission(context: Context) {
     TedPermission.create()
         .setPermissionListener(object : PermissionListener {
             override fun onPermissionGranted() {
-                // TODO:
+                val intent = Intent(context, Service::class.java)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
             }
 
             override fun onPermissionDenied(deniedPermissions: List<String>) {
