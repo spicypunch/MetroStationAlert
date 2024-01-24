@@ -106,4 +106,7 @@ dependencies {
     // Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+    // location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 }
