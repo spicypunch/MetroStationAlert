@@ -54,15 +54,12 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App(
-    viewModel: ViewModel = hiltViewModel()
-) {
+fun App() {
     val navController = rememberNavController()
     val bottomNavItems = listOf(
         BottomNavItem.Search,
         BottomNavItem.Bookmark
     )
-    viewModel.convertSubwayData(LocalContext.current)
 
     Scaffold(
         topBar = { CenterAlignedTopAppBar(title = { Text(text = "지금 내려야 한다.") }) },

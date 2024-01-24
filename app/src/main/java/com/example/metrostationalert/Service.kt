@@ -9,8 +9,25 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+
 
 class Service : Service() {
+
+    private val mLocationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+            if (locationResult != null && locationResult.lastLocation != null) {
+                val latitude = locationResult.lastLocation!!.latitude
+                val longitude = locationResult.lastLocation!!.longitude
+            }
+        }
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        throw UnsupportedOperationException("Not yet implemented")
+    }
 
     private val notificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

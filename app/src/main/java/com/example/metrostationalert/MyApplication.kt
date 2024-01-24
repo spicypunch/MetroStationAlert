@@ -7,9 +7,4 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class MyApplication : Application() {
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun onCreate() {
-        super.onCreate()
-    }
 }
