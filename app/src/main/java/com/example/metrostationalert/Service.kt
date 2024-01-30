@@ -1,5 +1,6 @@
 package com.example.metrostationalert
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
@@ -7,31 +8,74 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Build
 import android.os.IBinder
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
+import android.util.Log
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.*
 
 
 class Service : Service() {
 
-    private val mLocationCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            super.onLocationResult(locationResult)
-            if (locationResult != null && locationResult.lastLocation != null) {
-                val latitude = locationResult.lastLocation!!.latitude
-                val longitude = locationResult.lastLocation!!.longitude
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private val notificationManager by lazy {
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        createLocationRequest()
+        createLocationCallback()
+        startLocationUpdates()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    private fun createLocationRequest() {
+        locationRequest = LocationRequest.create().apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+    }
+
+    private fun createLocationCallback() {
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                locationResult.lastLocation?.let {
+                    handleNewLocation(it)
+                }
             }
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        throw UnsupportedOperationException("Not yet implemented")
+    private fun startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationProviderClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                null
+            )
+        }
     }
 
-    private val notificationManager by lazy {
-        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun handleNewLocation(location: Location) {
+        // 위치 정보를 받았을 때 처리할 동작
+        Log.e("latitude", location.latitude.toString())
+        Log.e("longitude", location.longitude.toString())
     }
+
 
     @SuppressLint("ForegroundServiceType")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -55,7 +99,8 @@ class Service : Service() {
         return START_NOT_STICKY
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+    override fun onDestroy() {
+        super.onDestroy()
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 }
