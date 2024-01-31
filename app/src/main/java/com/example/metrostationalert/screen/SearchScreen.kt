@@ -1,5 +1,6 @@
 package com.example.metrostationalert.screen
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -29,18 +31,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.metrostationalert.ViewModel
 import com.example.metrostationalert.data.entity.LatLngEntity
 import com.example.metrostationalert.data.entity.SubwayStationsEntity
+import com.example.metrostationalert.datastore.DataStore
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    viewModel: ViewModel = hiltViewModel()
+    viewModel: ViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-
+    val dataStore = DataStore(context)
     LaunchedEffect(Unit) {
         viewModel.convertSubwayData(context)
     }
@@ -113,7 +119,7 @@ fun SearchScreen(
                     Text(text = "검색")
                 }
             }
-            AllStationsLazyList(subwayStationsResult)
+            AllStationsLazyList(subwayStationsResult, dataStore)
         }
     }
 }
@@ -121,20 +127,27 @@ fun SearchScreen(
 @Composable
 fun AllStationsLazyList(
     subwayStationsResult: List<SubwayStationsEntity.SubwayStationItem>,
-    viewModel: ViewModel = hiltViewModel()
+    dataStore: DataStore,
 ) {
+    val scope = rememberCoroutineScope()
     LazyColumn() {
         items(subwayStationsResult) { item ->
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    viewModel.insertItem(
-                        LatLngEntity(
-                            latitude = item.latitude,
-                            longitude = item.longitude,
-                            stationName = item.stationName
-                        )
-                    )
+//                    viewModel.insertItem(
+//                        LatLngEntity(
+//                            latitude = item.latitude,
+//                            longitude = item.longitude,
+//                            stationName = item.stationName
+//                        )
+//                    )
+
+                    scope.launch {
+                        dataStore.saveStationName(item.stationName)
+                        dataStore.saveLatitude(item.latitude)
+                        dataStore.saveLongitude(item.longitude)
+                    }
                 }) {
                 Column {
                     Text(text = "노선: ${item.lineName}")

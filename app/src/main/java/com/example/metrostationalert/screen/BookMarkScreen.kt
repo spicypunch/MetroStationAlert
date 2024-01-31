@@ -1,5 +1,6 @@
 package com.example.metrostationalert.screen
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -14,34 +15,80 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.metrostationalert.ViewModel
 import com.example.metrostationalert.data.entity.LatLngEntity
+import com.example.metrostationalert.datastore.DataStore
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun BookMarkScreen(
-    viewModel: ViewModel = hiltViewModel()
+//    viewModel: ViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.getAllItems()
+    val context = LocalContext.current
+    val dataStore = DataStore(context)
+//    LaunchedEffect(Unit) {
+//        viewModel.getAllItems()
+//    }
+//    val bookmarkList = viewModel.getAllItems.value
+    var stationName by remember {
+        mutableStateOf("")
     }
-    val bookmarkList = viewModel.getAllItems.value
+    var latitude by remember {
+        mutableStateOf(0.0)
+    }
+    var longitude by remember {
+        mutableStateOf(0.0)
+    }
+    LaunchedEffect(Unit) {
+        dataStore.getStationName.collect() {
+            stationName = it
+        }
+    }
+    LaunchedEffect(Unit) {
+        dataStore.getLatitude.collect() {
+            latitude = it
+        }
+    }
+    LaunchedEffect(Unit) {
+        dataStore.getLongitude.collect() {
+            longitude = it
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        BookmarkStationLazyList(bookmarkList) {
-            viewModel.deleteItem(it)
-        }
+        BookmarkStationLazyList(
+            bookmarkList = listOf(
+                LatLngEntity(
+                    stationName = stationName,
+                    latitude = latitude,
+                    longitude = longitude
+                )
+            )
+        )
+
+//            viewModel.deleteItem(it)
+
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BookmarkStationLazyList(bookmarkList: List<LatLngEntity>, onLongClick: (LatLngEntity) -> Unit) {
+fun BookmarkStationLazyList(
+    bookmarkList: List<LatLngEntity>,
+//    onLongClick: (LatLngEntity) -> Unit
+) {
     LazyColumn() {
         items(bookmarkList) { item ->
             Box(
@@ -49,7 +96,7 @@ fun BookmarkStationLazyList(bookmarkList: List<LatLngEntity>, onLongClick: (LatL
                     .fillMaxWidth()
                     .combinedClickable(
                         onClick = {},
-                        onLongClick = { onLongClick(item) }
+//                        onLongClick = { onLongClick(item) }
                     )
             ) {
                 Column {
