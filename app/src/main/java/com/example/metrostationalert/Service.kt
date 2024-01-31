@@ -14,11 +14,18 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import com.example.metrostationalert.datastore.DataStore
 import com.google.android.gms.location.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 
 class Service : Service() {
-
+    private val dataStore = DataStore(this)
+    private var bookmarkLatitude = 0.0
+    private var bookmarkLongitude = 0.0
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
@@ -29,11 +36,25 @@ class Service : Service() {
     override fun onCreate() {
         super.onCreate()
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        getBookmarkLocation()
         createLocationRequest()
         createLocationCallback()
         startLocationUpdates()
     }
 
+    private fun getBookmarkLocation() {
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.getLatitude.collect() {
+                bookmarkLatitude = it
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.getLongitude.collect() {
+                bookmarkLongitude = it
+            }
+        }
+
+    }
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -72,8 +93,8 @@ class Service : Service() {
 
     private fun handleNewLocation(location: Location) {
         // 위치 정보를 받았을 때 처리할 동작
-        Log.e("latitude", location.latitude.toString())
-        Log.e("longitude", location.longitude.toString())
+        Log.e("latitude", bookmarkLatitude.toString())
+        Log.e("longitude", bookmarkLongitude.toString())
     }
 
 
