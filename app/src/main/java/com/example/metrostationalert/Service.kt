@@ -20,6 +20,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 class Service : Service() {
@@ -55,6 +60,7 @@ class Service : Service() {
         }
 
     }
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -93,8 +99,16 @@ class Service : Service() {
 
     private fun handleNewLocation(location: Location) {
         // 위치 정보를 받았을 때 처리할 동작
-        Log.e("latitude", bookmarkLatitude.toString())
-        Log.e("longitude", bookmarkLongitude.toString())
+        val distance = calculateDistance(
+            bookmarkLatitude = bookmarkLatitude,
+            bookmarkLongitude = bookmarkLongitude,
+            currentLatitude = location.latitude,
+            currentLongitude = location.longitude
+        )
+
+        if (distance < 0.5) {
+            sendNotification()
+        }
     }
 
 
@@ -104,24 +118,57 @@ class Service : Service() {
             val channel = NotificationChannel(
                 "1",
                 "알림",
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
 
             val notification: Notification = Notification.Builder(this, "1")
-                .setSmallIcon(R.drawable.ic_launcher_foreground) //알림 아이콘
-                .setContentTitle("알림") //알림의 제목 설정
-                .setContentText("앱이 실행 중입니다.") //알림의 내용 설정
+                .setSmallIcon(R.drawable.subway) //알림 아이콘
+                .setContentTitle("앱이 실행 중입니다.") //알림의 제목 설정
+                .setContentText("") //알림의 내용 설정
                 .build()
 
-            startForeground(1, notification) //인수로 알림 ID와 알림 지정
+            startForeground(1, notification)
         }
 
         return START_NOT_STICKY
     }
 
+    private fun sendNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notification: Notification = Notification.Builder(this, "1")
+                .setSmallIcon(R.drawable.subway) //알림 아이콘
+                .setContentTitle("곧 도착합니다!!!!") //알림의 제목 설정
+                .setContentText("내릴 준비!!!!!!!!!!!!!!!!!!!!!!!!!!") //알림의 내용 설정
+                .build()
+
+            startForeground(1, notification)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+    private fun calculateDistance(
+        bookmarkLatitude: Double,
+        bookmarkLongitude: Double,
+        currentLatitude: Double,
+        currentLongitude: Double
+    ): Double {
+        val earthRadius = 6371
+
+        val latDistance = Math.toRadians(currentLatitude - bookmarkLatitude)
+        val lonDistance = Math.toRadians(currentLongitude - bookmarkLongitude)
+
+        val a = sin(latDistance / 2).pow(2.0) +
+                cos(Math.toRadians(bookmarkLatitude)) *
+                cos(Math.toRadians(currentLatitude)) *
+                sin(lonDistance / 2).pow(2.0)
+
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        return earthRadius * c
     }
 }
