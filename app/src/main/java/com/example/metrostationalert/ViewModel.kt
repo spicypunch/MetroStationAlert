@@ -32,6 +32,7 @@ class ViewModel @Inject constructor(
 
     fun convertSubwayData(context: Context) {
         isLoading.value = true
+        subwayStationList.clear()
         val assetManager = context.resources.assets
         val inputStream = assetManager.open("SubwayStations.json")
         val jsonString = inputStream.bufferedReader().use { it.readText() }
