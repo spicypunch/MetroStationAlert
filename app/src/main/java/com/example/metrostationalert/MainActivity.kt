@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.metrostationalert.data.BottomNavItem
 import com.example.metrostationalert.screen.BookMarkScreen
 import com.example.metrostationalert.screen.SearchScreen
+import com.example.metrostationalert.screen.SettingsScreen
 import com.example.metrostationalert.ui.theme.MetroStationAlertTheme
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
@@ -56,11 +57,11 @@ fun App() {
     val navController = rememberNavController()
     val bottomNavItems = listOf(
         BottomNavItem.Search,
-        BottomNavItem.Bookmark
+        BottomNavItem.Bookmark,
+        BottomNavItem.Settings
     )
 
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text(text = "지금 내려야 한다.") }) },
         bottomBar = {
             NavigationBar {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -103,6 +104,9 @@ fun App() {
                 composable(route = BottomNavItem.Bookmark.route) {
                     BookMarkScreen()
                 }
+                composable(route = BottomNavItem.Settings.route) {
+                    SettingsScreen()
+                }
             }
         }
     }
@@ -113,7 +117,7 @@ fun requestPermission(context: Context) {
     TedPermission.create()
         .setPermissionListener(object : PermissionListener {
             override fun onPermissionGranted() {
-                val intent = Intent(context, Service::class.java)
+                val intent = Intent(context, LocationService::class.java)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent)
                 } else {

@@ -14,10 +14,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,61 +67,65 @@ fun SearchScreen(
         mutableStateOf("")
     }
 
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
+    Scaffold(
+        topBar = { CenterAlignedTopAppBar(title = { Text(text = "지금 내려야 한다.") }) },
     ) {
-        if (viewModel.isLoading.value) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else {
-            Row {
-//                    Spinner(
-//                        text = selectdeItem,
-//                        modifier = Modifier
-//                            .background(Color.LightGray)
-//                            .width(80.dp)
-//                            .height(35.dp),
-//                        itemList = optionList,
-//                        style = MaterialTheme.typography.bodyLarge,
-//                        properties = SpinnerProperties(
-//                            color = Color.Black,
-//                            textAlign = TextAlign.Center,
-//                            overflow = TextOverflow.Ellipsis,
-//                            maxLines = 1,
-//                            spinnerPadding = 16.dp,
-//                            spinnerBackgroundColor = MaterialTheme.colorScheme.background,
-//                        ),
-//                        onSpinnerItemSelected = { _, item ->
-//                            setSelectedItem(item)
-//                        }
-//                    )
-                OutlinedTextField(
-                    value = content, onValueChange = setContent, modifier = Modifier
-                        .padding(start = 8.dp)
-                        .weight(1f)
-                        .height(50.dp),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = {
-                        keyboardController?.hide()
-                        viewModel.searchStation(content)
-                    })
-                )
-
-                Button(
-                    onClick = {
-                        keyboardController?.hide()
-                        viewModel.searchStation(content)
-                    },
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .height(50.dp)
-                ) {
-                    Text(text = "검색")
+        Column(
+            modifier = Modifier
+                .padding(8.dp).padding(it)
+        ) {
+            if (viewModel.isLoading.value) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
                 }
+            } else {
+                Row {
+                    //                    Spinner(
+                    //                        text = selectdeItem,
+                    //                        modifier = Modifier
+                    //                            .background(Color.LightGray)
+                    //                            .width(80.dp)
+                    //                            .height(35.dp),
+                    //                        itemList = optionList,
+                    //                        style = MaterialTheme.typography.bodyLarge,
+                    //                        properties = SpinnerProperties(
+                    //                            color = Color.Black,
+                    //                            textAlign = TextAlign.Center,
+                    //                            overflow = TextOverflow.Ellipsis,
+                    //                            maxLines = 1,
+                    //                            spinnerPadding = 16.dp,
+                    //                            spinnerBackgroundColor = MaterialTheme.colorScheme.background,
+                    //                        ),
+                    //                        onSpinnerItemSelected = { _, item ->
+                    //                            setSelectedItem(item)
+                    //                        }
+                    //                    )
+                    OutlinedTextField(
+                        value = content, onValueChange = setContent, modifier = Modifier
+                            .padding(start = 8.dp)
+                            .weight(1f)
+                            .height(50.dp),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = {
+                            keyboardController?.hide()
+                            viewModel.searchStation(content)
+                        })
+                    )
+
+                    Button(
+                        onClick = {
+                            keyboardController?.hide()
+                            viewModel.searchStation(content)
+                        },
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .height(50.dp)
+                    ) {
+                        Text(text = "검색")
+                    }
+                }
+                AllStationsLazyList(subwayStationsResult, dataStore)
             }
-            AllStationsLazyList(subwayStationsResult, dataStore)
         }
     }
 }
