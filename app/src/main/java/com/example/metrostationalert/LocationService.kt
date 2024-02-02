@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -18,7 +19,6 @@ import com.example.metrostationalert.datastore.DataStore
 import com.google.android.gms.location.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -27,7 +27,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 
-class Service : Service() {
+class LocationService : Service() {
     private val dataStore = DataStore(this)
     private var bookmarkLatitude = 0.0
     private var bookmarkLongitude = 0.0
@@ -37,6 +37,7 @@ class Service : Service() {
     private val notificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
+    private var alertState = true
 
     override fun onCreate() {
         super.onCreate()
@@ -106,8 +107,11 @@ class Service : Service() {
             currentLongitude = location.longitude
         )
 
-        if (distance < 0.5) {
+        if (distance <= 1.0 && alertState) {
             sendNotification()
+            alertState = false
+        } else if (distance > 1.0) {
+            alertState = true
         }
     }
 
@@ -131,15 +135,23 @@ class Service : Service() {
             startForeground(1, notification)
         }
 
+        if (intent?.action == "ACTION_STOP") {
+            stopSelf()
+        }
+
         return START_NOT_STICKY
     }
 
     private fun sendNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val closeIntent = Intent(this, LocationService::class.java)
+            closeIntent.action = "ACTION_STOP"
+            val closePendingIntent = PendingIntent.getService(this, 0, closeIntent, PendingIntent.FLAG_IMMUTABLE)
             val notification: Notification = Notification.Builder(this, "1")
-                .setSmallIcon(R.drawable.subway) //알림 아이콘
-                .setContentTitle("곧 도착합니다!!!!") //알림의 제목 설정
-                .setContentText("내릴 준비!!!!!!!!!!!!!!!!!!!!!!!!!!") //알림의 내용 설정
+                .setSmallIcon(R.drawable.subway)
+                .setContentTitle("곧 도착합니다!!!!")
+                .setContentText("내릴 준비!!!!!!!!!!!!!!!!!!!!!!!!!!")
+//                .addAction(R.drawable.check, "닫기", closePendingIntent)
                 .build()
 
             startForeground(1, notification)

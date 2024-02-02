@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +32,7 @@ import com.example.metrostationalert.data.entity.LatLngEntity
 import com.example.metrostationalert.datastore.DataStore
 import kotlinx.coroutines.flow.collect
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookMarkScreen(
 //    viewModel: ViewModel = hiltViewModel()
@@ -63,23 +67,28 @@ fun BookMarkScreen(
             longitude = it
         }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
+    Scaffold(
+        topBar = { CenterAlignedTopAppBar(title = { Text(text = "즐겨찾기") }) },
     ) {
-        BookmarkStationLazyList(
-            bookmarkList = listOf(
-                LatLngEntity(
-                    stationName = stationName,
-                    latitude = latitude,
-                    longitude = longitude
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+                .padding(it)
+        ) {
+            BookmarkStationLazyList(
+                bookmarkList = listOf(
+                    LatLngEntity(
+                        stationName = stationName,
+                        latitude = latitude,
+                        longitude = longitude
+                    )
                 )
             )
-        )
 
-//            viewModel.deleteItem(it)
+            //            viewModel.deleteItem(it)
 
+        }
     }
 }
 
