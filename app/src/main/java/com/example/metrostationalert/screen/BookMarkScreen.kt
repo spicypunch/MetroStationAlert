@@ -14,11 +14,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,10 +49,10 @@ fun BookMarkScreen(
         mutableStateOf("")
     }
     var latitude by remember {
-        mutableStateOf(0.0)
+        mutableDoubleStateOf(0.0)
     }
     var longitude by remember {
-        mutableStateOf(0.0)
+        mutableDoubleStateOf(0.0)
     }
     LaunchedEffect(Unit) {
         dataStore.getStationName.collect() {
@@ -110,11 +112,6 @@ fun BookmarkStationLazyList(
             ) {
                 Column {
                     Text(text = "역이름: ${item.stationName}")
-                    Divider(
-                        modifier = Modifier
-                            .height(10.dp)
-                            .padding(8.dp)
-                    )
                 }
             }
         }

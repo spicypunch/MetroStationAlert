@@ -19,6 +19,7 @@ import com.example.metrostationalert.datastore.DataStore
 import com.google.android.gms.location.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -31,6 +32,9 @@ class LocationService : Service() {
     private val dataStore = DataStore(this)
     private var bookmarkLatitude = 0.0
     private var bookmarkLongitude = 0.0
+    private var alertDistance = 0.0f
+    private var notiTitle = ""
+    private var notiContent = ""
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
@@ -43,6 +47,7 @@ class LocationService : Service() {
         super.onCreate()
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         getBookmarkLocation()
+        getNotificationContent()
         createLocationRequest()
         createLocationCallback()
         startLocationUpdates()
@@ -59,7 +64,24 @@ class LocationService : Service() {
                 bookmarkLongitude = it
             }
         }
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.getDistance.collect() {
+                alertDistance = it
+            }
+        }
+    }
 
+    private fun getNotificationContent() {
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.getNotiTitle.collect() {
+                notiTitle = it
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.getNotiContent.collect() {
+                notiContent = it
+            }
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -107,10 +129,10 @@ class LocationService : Service() {
             currentLongitude = location.longitude
         )
 
-        if (distance <= 1.0 && alertState) {
+        if (distance <= alertDistance && alertState) {
             sendNotification()
             alertState = false
-        } else if (distance > 1.0) {
+        } else if (distance > alertDistance) {
             alertState = true
         }
     }
@@ -149,8 +171,8 @@ class LocationService : Service() {
             val closePendingIntent = PendingIntent.getService(this, 0, closeIntent, PendingIntent.FLAG_IMMUTABLE)
             val notification: Notification = Notification.Builder(this, "1")
                 .setSmallIcon(R.drawable.subway)
-                .setContentTitle("곧 도착합니다!!!!")
-                .setContentText("내릴 준비!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                .setContentTitle(notiTitle)
+                .setContentText(notiContent)
 //                .addAction(R.drawable.check, "닫기", closePendingIntent)
                 .build()
 

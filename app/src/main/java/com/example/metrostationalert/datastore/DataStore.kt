@@ -1,10 +1,10 @@
 package com.example.metrostationalert.datastore
 
 import android.content.Context
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +18,9 @@ class DataStore(private val context: Context) {
         private val stationNameKey = stringPreferencesKey("stationName")
         private val latitudeKey = doublePreferencesKey("latitude")
         private val longitudeeKey = doublePreferencesKey("longitude")
-        private val locationUpdateStartedKey = booleanPreferencesKey("locationUpdateStarted")
+        private val distanceKey = floatPreferencesKey("distance")
+        private val notiTitleKey = stringPreferencesKey("notiTitle")
+        private val notiContentKey = stringPreferencesKey("notiContent")
     }
 
     val getStationName: Flow<String> = context.dataStore.data
@@ -57,17 +59,40 @@ class DataStore(private val context: Context) {
             preference[longitudeeKey] ?: 0.0
         }
 
-    val getLocationUpdateStarted: Flow<Boolean> = context.dataStore.data
-        .catch {exception ->
+    val getDistance: Flow<Float> = context.dataStore.data
+        .catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
             } else {
                 throw exception
             }
         }
-        .map {preference ->
-            preference[locationUpdateStartedKey] ?: false
+        .map { preference ->
+            preference[distanceKey] ?: 1.0f
+        }
 
+    val getNotiTitle: Flow<String> = context.dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preference ->
+            preference[notiTitleKey] ?: "도착!"
+        }
+
+    val getNotiContent: Flow<String> = context.dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preference ->
+            preference[notiContentKey] ?: "내릴 준비!!!!!"
         }
 
     suspend fun saveStationName(stationName: String) {
@@ -88,9 +113,21 @@ class DataStore(private val context: Context) {
         }
     }
 
-    suspend fun saveLocationUpdateStarted(locationUpdateStarted: Boolean) {
+    suspend fun saveDistance(distance: Float) {
         context.dataStore.edit { preference ->
-            preference[locationUpdateStartedKey] = locationUpdateStarted
+            preference[distanceKey] = distance
+        }
+    }
+
+    suspend fun saveNotiTitle(notiTitle: String) {
+        context.dataStore.edit { preference ->
+            preference[notiTitleKey] = notiTitle
+        }
+    }
+
+    suspend fun saveNotiContent(notiContent: String) {
+        context.dataStore.edit { preference ->
+            preference[notiContentKey] = notiContent
         }
     }
 }
