@@ -1,6 +1,5 @@
 package com.example.metrostationalert.screen
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -18,12 +18,16 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -33,14 +37,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.metrostationalert.ViewModel
-import com.example.metrostationalert.data.entity.LatLngEntity
 import com.example.metrostationalert.data.entity.SubwayStationsEntity
 import com.example.metrostationalert.datastore.DataStore
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +54,7 @@ fun SearchScreen(
         viewModel.convertSubwayData(context)
     }
 
+    val scope = rememberCoroutineScope()
     val subwayStationsResult = viewModel.subwayStations.value
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -72,7 +74,8 @@ fun SearchScreen(
     ) {
         Column(
             modifier = Modifier
-                .padding(8.dp).padding(it)
+                .padding(8.dp)
+                .padding(it)
         ) {
             if (viewModel.isLoading.value) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -119,7 +122,8 @@ fun SearchScreen(
                         },
                         modifier = Modifier
                             .padding(start = 8.dp)
-                            .height(50.dp)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Text(text = "검색")
                     }
@@ -136,33 +140,42 @@ fun AllStationsLazyList(
     dataStore: DataStore,
 ) {
     val scope = rememberCoroutineScope()
-    LazyColumn() {
-        items(subwayStationsResult) { item ->
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-//                    viewModel.insertItem(
-//                        LatLngEntity(
-//                            latitude = item.latitude,
-//                            longitude = item.longitude,
-//                            stationName = item.stationName
-//                        )
-//                    )
+    val snackbarHostState = remember { SnackbarHostState() }
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) {
+        LazyColumn(
+            modifier = Modifier.padding(it)
+        ) {
+            items(subwayStationsResult) { item ->
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        //                    viewModel.insertItem(
+                        //                        LatLngEntity(
+                        //                            latitude = item.latitude,
+                        //                            longitude = item.longitude,
+                        //                            stationName = item.stationName
+                        //                        )
+                        //                    )
 
-                    scope.launch {
-                        dataStore.saveStationName(item.stationName)
-                        dataStore.saveLatitude(item.latitude)
-                        dataStore.saveLongitude(item.longitude)
+                        scope.launch {
+                            dataStore.saveStationName(item.stationName)
+                            dataStore.saveLatitude(item.latitude)
+                            dataStore.saveLongitude(item.longitude)
+                            snackbarHostState.showSnackbar("저장되었습니다.")
+                        }
+                    }) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    ) {
+                        Text(text = "노선: ${item.lineName}")
+                        Text(text = "역이름: ${item.stationName}")
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .height(10.dp)
+                        )
                     }
-                }) {
-                Column {
-                    Text(text = "노선: ${item.lineName}")
-                    Text(text = "역이름: ${item.stationName}")
-                    Divider(
-                        modifier = Modifier
-                            .height(10.dp)
-                            .padding(8.dp)
-                    )
                 }
             }
         }
