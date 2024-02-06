@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.metrostationalert"
+    namespace = "com.jm.metrostationalert"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.metrostationalert"
+        applicationId = "com.jm.metrostationalert"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -24,7 +24,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "OpenAPI", getApiKey("OpenAPI"))
+        buildConfigField("String", "OpenAPIKey", getApiKey("OpenAPIKey"))
+        buildConfigField("String", "OpenAPIUrl", getApiKey("OpenAPIUrl"))
     }
 
     buildTypes {
@@ -58,6 +59,10 @@ android {
 }
 fun getApiKey(propertyKey: String): String {
     return gradleLocalProperties(rootDir).getProperty(propertyKey)
+}
+
+fun getApiUrl(propertyUrl: String): String {
+    return gradleLocalProperties(rootDir).getProperty(propertyUrl)
 }
 
 dependencies {
@@ -117,4 +122,11 @@ dependencies {
 
     // location
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Admob
+    implementation("com.google.android.gms:play-services-ads:22.6.0")
 }
