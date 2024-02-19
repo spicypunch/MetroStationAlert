@@ -26,9 +26,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "OpenAPIKey", getApiKey("OpenAPIKey"))
-        buildConfigField("String", "OpenAPIUrl", getApiKey("OpenAPIUrl"))
-        buildConfigField("String", "AdMobId", getApiKey("AdMobId"))
+        buildConfigField("String", "OpenAPIKey", getKey("OpenAPIKey"))
+        buildConfigField("String", "OpenAPIUrl", getKey("OpenAPIUrl"))
+        buildConfigField("String", "AdMobId", getKey("AdMobId"))
+        buildConfigField("String", "AdMobIdTest", getKey("AdMobIdTest"))
     }
 
     buildTypes {
@@ -60,16 +61,8 @@ android {
         }
     }
 }
-fun getApiKey(propertyKey: String): String {
+fun getKey(propertyKey: String): String {
     return gradleLocalProperties(rootDir).getProperty(propertyKey)
-}
-
-fun getApiUrl(propertyUrl: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyUrl)
-}
-
-fun getAdMobId(propertyUrl: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyUrl)
 }
 
 dependencies {
