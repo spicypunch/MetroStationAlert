@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "534529633958",
+    "project_id": "subway-exit-reminder",
+    "storage_bucket": "subway-exit-reminder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534529633958:android:135be5b501e9a52d18ce67",
+        "android_client_info": {
+          "package_name": "com.jm.metrostationalert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsqWVk9wHfR_CQv30crEL1oB55cO-5rT4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -199,7 +199,7 @@ fun SettingsScreen() {
                     }
                 }
             }
-//            BannersAds()
+            BannersAds()
         }
     }
 }
