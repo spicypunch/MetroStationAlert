@@ -7,6 +7,8 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -17,20 +19,22 @@ android {
         applicationId = "com.jm.metrostationalert"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "OpenAPIKey", getApiKey("OpenAPIKey"))
-        buildConfigField("String", "OpenAPIUrl", getApiKey("OpenAPIUrl"))
+        buildConfigField("String", "OpenAPIKey", getKey("OpenAPIKey"))
+        buildConfigField("String", "OpenAPIUrl", getKey("OpenAPIUrl"))
+        buildConfigField("String", "AdMobId", getKey("AdMobId"))
+        buildConfigField("String", "AdMobIdTest", getKey("AdMobIdTest"))
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -57,12 +61,8 @@ android {
         }
     }
 }
-fun getApiKey(propertyKey: String): String {
+fun getKey(propertyKey: String): String {
     return gradleLocalProperties(rootDir).getProperty(propertyKey)
-}
-
-fun getApiUrl(propertyUrl: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyUrl)
 }
 
 dependencies {
@@ -129,4 +129,9 @@ dependencies {
 
     // Admob
     implementation("com.google.android.gms:play-services-ads:22.6.0")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 }

@@ -110,7 +110,7 @@ fun BookMarkScreen(
 
                 }
             }
-//            BannersAds()
+            BannersAds()
         }
     }
 }

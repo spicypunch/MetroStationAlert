@@ -12,3 +12,5 @@
 - Room
 - TedPermission
 - Gson
+- Retrofit
+- Admob

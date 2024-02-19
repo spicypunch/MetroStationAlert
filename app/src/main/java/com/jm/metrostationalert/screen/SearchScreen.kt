@@ -127,7 +127,7 @@ fun SearchScreen(
                         Text(text = "검색")
                     }
                 }
-//                BannersAds()
+                BannersAds()
                 AllStationsLazyList(subwayStationsResult, dataStore)
             }
         }
