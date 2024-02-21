@@ -6,11 +6,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.jm.metrostationalert.data.SubwayArrivalResponse
 import com.jm.metrostationalert.data.entity.LatLngEntity
 import com.jm.metrostationalert.data.entity.SubwayStationsEntity
 import com.jm.metrostationalert.repository.RepositoryImpl
-import com.google.gson.Gson
-import com.jm.metrostationalert.data.SubwayArrivalResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,6 +50,10 @@ class ViewModel @Inject constructor(
 
     fun searchStation(searchString: String) {
         _subwayStations.value = subwayStationList.filter { it.stationName.contains(searchString) }
+    }
+
+    fun filterLineName(lineName: String) {
+        _subwayStations.value = subwayStationList.filter { it.lineName == lineName }
     }
 
     fun getAllItems() {

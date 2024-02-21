@@ -142,7 +142,7 @@ class LocationService : Service() {
             val channel = NotificationChannel(
                 "1",
                 "알림",
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_LOW
             )
             notificationManager.createNotificationChannel(channel)
 
@@ -153,6 +153,13 @@ class LocationService : Service() {
                 .build()
 
             startForeground(1, notification)
+
+            val channel2 = NotificationChannel(
+                "2",
+                "하차 알림",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel2)
         }
 
         if (intent?.action == "ACTION_STOP") {
@@ -167,7 +174,7 @@ class LocationService : Service() {
             val closeIntent = Intent(this, LocationService::class.java)
             closeIntent.action = "ACTION_STOP"
             val closePendingIntent = PendingIntent.getService(this, 0, closeIntent, PendingIntent.FLAG_IMMUTABLE)
-            val notification: Notification = Notification.Builder(this, "1")
+            val notification: Notification = Notification.Builder(this, "2")
                 .setSmallIcon(R.drawable.subway)
                 .setContentTitle(notiTitle)
                 .setContentText(notiContent)
