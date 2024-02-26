@@ -6,13 +6,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.internal.Logger.TAG
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.jm.metrostationalert.data.SubwayArrivalResponse
 import com.jm.metrostationalert.data.entity.LatLngEntity
 import com.jm.metrostationalert.data.entity.SubwayStationsEntity
 import com.jm.metrostationalert.repository.RepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,17 +38,29 @@ class ViewModel @Inject constructor(
     val getStationArrivalTime: State<SubwayArrivalResponse?> = _getStationArrivalTime
 
     fun convertSubwayData(context: Context) {
-        isLoading.value = true
-        subwayStationList.clear()
-        val assetManager = context.resources.assets
-        val inputStream = assetManager.open("SubwayStations.json")
-        val jsonString = inputStream.bufferedReader().use { it.readText() }
-        val result = Gson().fromJson(jsonString, SubwayStationsEntity::class.java)
-        result.forEach {
-            subwayStationList.add(it)
+        try {
+            isLoading.value = true
+            subwayStationList.clear()
+            val assetManager = context.resources.assets
+            val inputStream = assetManager.open("SubwayStations.json")
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
+            val result = Gson().fromJson(jsonString, SubwayStationsEntity::class.java)
+            result.forEach {
+                subwayStationList.add(it)
+            }
+            _subwayStations.value = subwayStationList
+        } catch (e: IOException) {
+            // 파일 열기 실패
+            Log.e(TAG, "Error reading SubwayStations.json: $e")
+        } catch (e: JsonSyntaxException) {
+            // JSON 파싱 실패
+            Log.e(TAG, "Error parsing JSON: $e")
+        } catch (e: Exception) {
+            // 기타 예외 처리
+            Log.e(TAG, "Unexpected error: $e")
+        } finally {
+            isLoading.value = false
         }
-        _subwayStations.value = subwayStationList
-        isLoading.value = false
     }
 
     fun searchStation(searchString: String) {
