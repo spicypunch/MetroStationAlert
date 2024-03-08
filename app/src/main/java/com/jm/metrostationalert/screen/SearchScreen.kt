@@ -9,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,7 +21,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +45,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -88,7 +87,11 @@ fun SearchScreen(
                 SearchStation()
                 BannersAds()
                 SkydovesSpinner()
-                AllStationsLazyList(subwayStationsResult, snackbarHostState, dataStore)
+                if (subwayStationsResult.isEmpty()) {
+                    EmptyScreen()
+                } else {
+                    AllStationsLazyList(subwayStationsResult, snackbarHostState, dataStore)
+                }
             }
         }
     }
@@ -225,6 +228,16 @@ fun AllStationsLazyList(
 }
 
 @Composable
+fun EmptyScreen() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "검색하신 역이 없습니다.", fontSize = 30.sp)
+    }
+
+}
+
+@Composable
 fun StationItems(
     item: SubwayStationsEntity.SubwayStationItem,
     snackbarHostState: SnackbarHostState,
@@ -312,4 +325,11 @@ fun CornerShapeButton(text: String, modifier: Modifier, onClicked: () -> Unit) {
     ) {
         Text(text = text, fontSize = 12.sp)
     }
+}
+
+@Preview
+@Composable
+fun PreviewSearchScreen() {
+    SearchScreen()
+
 }
