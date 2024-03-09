@@ -87,11 +87,7 @@ fun SearchScreen(
                 SearchStation()
                 BannersAds()
                 SkydovesSpinner()
-                if (subwayStationsResult.isEmpty()) {
-                    EmptyScreen()
-                } else {
-                    AllStationsLazyList(subwayStationsResult, snackbarHostState, dataStore)
-                }
+                AllStationsLazyList(subwayStationsResult, snackbarHostState, dataStore)
             }
         }
     }
