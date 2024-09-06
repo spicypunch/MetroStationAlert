@@ -31,14 +31,17 @@
 #### 즐겨찾기 화면
 <img src = "https://github.com/user-attachments/assets/464968f4-17f4-44b8-a7b6-5a8364650be8" width = "200">
 <img src = "https://github.com/user-attachments/assets/36e11c88-3d56-4eee-a675-b1893d1c2942" width = "200">
+
 - 하차 알림을 받을 역과, 지하철 도착 정보를 받을 역을 볼 수 있습니다. 지하철 도착 정보를 받을 역은 여러개 등록 가능합니다.
 
 #### 설정 화면
 <img src = "https://github.com/user-attachments/assets/6821f6ee-ee0e-4952-b2f6-8fcc1eb6efe9" width = "200">
 <img src = "https://github.com/user-attachments/assets/049d80c2-b7ac-4f43-9f78-6141cec3274e" width = "200">
+
 - 알림을 받을 메시지의 제목과 내용을 따로 수정할 수 있습니다.
 - 도착 몇 km 전에 알림을 받을지 Slider로 설정할 수 있습니다.
 
 #### 알림 도착
 <img src = "https://github.com/user-attachments/assets/61046e13-dc16-4fba-8171-fc8524c2ed44" width = "200">
+
 - 백그라운드에서 현재 위치와 목적지까지의 거리를 수시로 계산하며, 내가 설정한 거리 안으로 들어왔을 경우 알림을 보냅니다.
