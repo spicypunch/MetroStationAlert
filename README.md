@@ -1,6 +1,8 @@
-직접 사용하려고 만든 앱이에요.
-지하철에서 유튜브 보다가 하차해야 하는 역을 놓치는 일이 종종 있어서 제작했어요.
-내가 하차해야 할 역을 등록하면 역에 도착하기 전에 알려줘요.
+직접 사용하려고 만든 앱입니다.
+
+지하철에서 유튜브 보다가 하차해야 하는 역을 놓치는 일이 종종 있어서 제작했습니다.
+
+내가 하차해야 할 역을 등록하면 역에 도착하기 전에 하차해야한다고 알려줍니다.
 
 [![Play Store](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.jm.metrostationalert)
 
